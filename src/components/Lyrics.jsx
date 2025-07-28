@@ -56,6 +56,14 @@ function normalizeLyrics(lyrics) {
     })
 }
 
+function saveGame(currentIndex, lyrics) {
+    window.localStorage.setItem('gameData', JSON.stringify({ currentIndex, lyrics }));
+}
+
+function loadGame() {
+    return JSON.parse(window.localStorage.getItem('gameData'));
+}
+
 function updateIndexToNextLetter(lyrics, index) {
   let isLetter = false;
   do {
@@ -69,8 +77,27 @@ function updateIndexToNextLetter(lyrics, index) {
 
 function Lyrics() {
     const [lyrics, setLyrics] = useState(normalizeLyrics(lyricsPlaceHolder));
+    console.log("initial -> ", lyrics);
     
     let currentIndex = useRef(0);
+
+    // const savedData = loadGame();
+
+    // if (savedData) {
+    //     currentIndex = savedData.currentIndex;
+    //     setLyrics(savedData.lyrics);
+    // }
+
+    useEffect(() => {
+      const savedData = loadGame();
+
+      if (savedData) {
+          currentIndex = savedData.currentIndex;
+          setLyrics(savedData.lyrics);
+      }
+
+      console.log("useEffect -> ", lyrics);
+    }, []);
 
     useEffect(() => {
         const handleKeyDown = (event) => {
@@ -79,6 +106,8 @@ function Lyrics() {
             updatedLyrics[currentIndex.current].visible = true;
             setLyrics(updatedLyrics);
             updateIndexToNextLetter(lyrics, currentIndex);
+
+            saveGame(currentIndex, lyrics);
           } else {
             console.log(`correct: ${lyrics[currentIndex.current].char.toLowerCase()} | pressed: ${event.key.toLowerCase()}`)
           }
