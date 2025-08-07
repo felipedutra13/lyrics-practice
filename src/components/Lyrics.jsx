@@ -77,37 +77,31 @@ function updateIndexToNextLetter(lyrics, index) {
 
 function Lyrics() {
     const [lyrics, setLyrics] = useState(normalizeLyrics(lyricsPlaceHolder));
-    console.log("initial -> ", lyrics);
+    const currentIndex = useRef(0);
     
-    let currentIndex = useRef(0);
-
-    // const savedData = loadGame();
-
-    // if (savedData) {
-    //     currentIndex = savedData.currentIndex;
-    //     setLyrics(savedData.lyrics);
-    // }
-
     useEffect(() => {
       const savedData = loadGame();
 
       if (savedData) {
-          currentIndex = savedData.currentIndex;
+          currentIndex.current = savedData.currentIndex;
           setLyrics(savedData.lyrics);
       }
 
-      console.log("useEffect -> ", lyrics);
     }, []);
 
     useEffect(() => {
         const handleKeyDown = (event) => {
+          if (event.key.length !== 1 || !/^[a-zA-Z]$/.test(event.key)) {
+            return;
+          }
+
           if (lyrics[currentIndex.current].char.toLowerCase() == event.key.toLowerCase()) {
             const updatedLyrics = [...lyrics];
             updatedLyrics[currentIndex.current].visible = true;
             setLyrics(updatedLyrics);
             updateIndexToNextLetter(lyrics, currentIndex);
 
-            saveGame(currentIndex, lyrics);
+            saveGame(currentIndex.current, lyrics);
           } else {
             console.log(`correct: ${lyrics[currentIndex.current].char.toLowerCase()} | pressed: ${event.key.toLowerCase()}`)
           }
@@ -118,7 +112,7 @@ function Lyrics() {
         return () => {
           window.removeEventListener('keydown', handleKeyDown);
         };
-      }, []);
+      }, [lyrics]);
 
     return (
         <>

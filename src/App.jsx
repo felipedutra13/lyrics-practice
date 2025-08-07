@@ -8,7 +8,7 @@ function App() {
     <>
       <div>
         <div>
-          {/* <VideoPlayer></VideoPlayer> */}
+          <VideoPlayer></VideoPlayer>
         </div>
         <div>
           <Lyrics></Lyrics>
